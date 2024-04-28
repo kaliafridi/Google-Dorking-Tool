@@ -16,8 +16,8 @@ Before running this script, you need Python installed on your system. Python 3.6
 
 Clone the repository to your local machine:
 ```bash
-git clone https://github.com/yourusername/google-dorking-tool.git
-cd google-dorking-tool
+git clone https://github.com/kaliafridi/Google-Dorking-Tool
+cd Google-Dorking-Tool
 ```
 
 Install the necessary dependencies:
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 Run the script by navigating to the script's directory and running:
 ```bash
-python3 google_dorking_tool.py
+python3 Google_Dorking_Tool.py
 ```
 
 ## AND ENJOY! HAPPY DORKING!!!!
