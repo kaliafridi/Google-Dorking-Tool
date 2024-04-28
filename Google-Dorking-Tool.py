@@ -1,9 +1,22 @@
-from googlesearch import search
+import socket
 import colorama
 from colorama import Fore, Style
 import sys
+from googlesearch import search
 
 colorama.init(autoreset=True)
+
+def input_target():
+    target = input(Fore.MAGENTA + "Enter the target domain: ").strip()
+    if not target.endswith('.com') and not target.endswith('.org') and not target.endswith('.net'):
+        print(Fore.RED + "Invalid domain format. Please enter a domain with .com, .org, or .net TLD.")
+        return None
+
+    if not socket.gethostbyname(target):
+        print(Fore.RED + "The domain is not reachable. Please check the domain and try again.")
+        return None
+
+    return target
 
 def print_skull():
     print(Fore.YELLOW + r"""
@@ -22,6 +35,7 @@ def print_skull():
 │  \_/ \_/    \_/ \_/ \_/ \_/ \_/ \_/  │
 │                                      │
 └──────────────────────────────────────┘
+              Version 2.0 By @vortex4242
               """)
 
 
@@ -95,13 +109,16 @@ def camera_dorking():
 
 def main():
     print_skull()
+    target = input_target()
+    if not target:
+        sys.exit(1)
+
     print(Fore.YELLOW + "1. Website Dorking")
     print(Fore.YELLOW + "2. Individual Dorking")
     print(Fore.YELLOW + "3. Camera Dorking")
     choice = int(input(Fore.BLUE + "Select an option (1, 2, or 3): "))
-    
+
     if choice == 1:
-        target = input(Fore.MAGENTA + "Enter the target domain: ").strip()
         select_website_dork(target)
     elif choice == 2:
         individual_dorking()
