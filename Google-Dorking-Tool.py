@@ -6,38 +6,34 @@ from googlesearch import search
 
 colorama.init(autoreset=True)
 
-def input_target():
-    target = input(Fore.MAGENTA + "Enter the target domain: ").strip()
-    if not target.endswith('.com') and not target.endswith('.org') and not target.endswith('.net'):
-        print(Fore.RED + "Invalid domain format. Please enter a domain with .com, .org, or .net TLD.")
+def input_target(prompt_text):
+    print(Fore.MAGENTA + prompt_text, end="")
+    target = input().strip()
+    if not target:
+        print(Fore.RED + "Input cannot be empty. Please try again.")
         return None
-
-    if not socket.gethostbyname(target):
-        print(Fore.RED + "The domain is not reachable. Please check the domain and try again.")
-        return None
-
     return target
 
 def print_skull():
     print(Fore.YELLOW + r"""
-┌──────────────────────────────────┐
-│                                  │
-│ ╔═╗┌─┐┌─┐┌─┐┬  ┌─┐  ╔╦╗┌─┐┬─┐┬┌─ │
-│ ║ ╦│ ││ ││ ┬│  ├┤    ║║│ │├┬┘├┴┐ │
-│ ╚═╝└─┘└─┘└─┘┴─┘└─┘  ═╩╝└─┘┴└─┴ ┴ │
-│                                  │
-└──────────────────────────────────┘
-┌──────────────────────────────────────┐
-│                                      │
-│   _   _      _   _   _   _   _   _   │
-│  / \ / \    / \ / \ / \ / \ / \ / \  │
-│ ( B | y )  ( R | a | y | y | a | n ) │
-│  \_/ \_/    \_/ \_/ \_/ \_/ \_/ \_/  │
-│                                      │
-└──────────────────────────────────────┘
-              Version 2.0 By @vortex4242
-              """)
-
+     ┌──────────────────────────────────┐
+     │                                  │
+     │ ╔═╗┌─┐┌─┐┌─┐┬  ┌─┐  ╔╦╗┌─┐┬─┐┬┌─ │
+     │ ║ ╦│ ││ ││ ┬│  ├┤    ║║│ │├┬┘├┴┐ │
+     │ ╚═╝└─┘└─┘└─┘┴─┘└─┘  ═╩╝└─┘┴└─┴ ┴ │
+     │                                  │
+     └──────────────────────────────────┘
+     ┌──────────────────────────────────────┐
+     │                                      │
+     │   _   _      _   _   _   _   _   _   │
+     │  / \ / \    / \ / \ / \ / \ / \ / \  │
+     │ ( B | y )  ( R | a | y | y | a | n ) │
+     │  \_/ \_/    \_/ \_/ \_/ \_/ \_/ \_/  │
+     │                                      │
+     └──────────────────────────────────────┘
+                [ Version 3.0.0 ]
+         [ Special Thanks to @Vortex4242 ]
+    """)
 
 def google_dork(query, num_results=10):
     print(Fore.CYAN + "Performing Google Dork search with payload: " + query)
@@ -59,74 +55,113 @@ def display_results(results):
     else:
         print(Fore.RED + "No results found.")
 
-def select_website_dork(target):
+def menu_select(options):
+    for key, value in options.items():
+        print(Fore.CYAN + f"{key}: {value}")
+    choice = input(Fore.BLUE + "Select an option by number: ")
+    return choice
+
+def select_dorking_category():
     categories = {
-        "Configuration Files": "site:{target} ext:xml | ext:conf | ext:cnf | ext:reg | ext:inf | ext:rdp | ext:cfg | ext:txt | ext:ora | ext:env | ext:ini",
-        "Database Files": "site:{target} ext:sql | ext:db | ext:dbf | ext:mdb",
-        "Backup Files": "site:{target} ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup",
-        "Source Code Repositories": "inurl:\"/.git\" {target} -site:github.com",
-        "Document Files": "site:{target} ext:doc | ext:docx | ext:odt | ext:pdf",
-        "Error Messages": "site:{target} intext:\"error log\"",
-        "Common Web Files": "site:{target} \"Index of /admin\"",
-        "Cloud Services": "site:\"blob.core.windows.net\" {target}",
-        "Git Providers": "site:github.com {target} | site:gitlab.com {target}",
-        "Login Pages": "site:{target} inurl:login"
+        "1": "Website Dorking",
+        "2": "Educational Files",
+        "3": "Government Files",
+        "4": "Social Media Dorking",
+        "5": "Camera Dorking",
+        "6": "Individual Dorking"
     }
 
-    print(Fore.GREEN + "Available Website Categories:\n")
-    for key in categories:
-        print(Fore.CYAN + Style.BRIGHT + key)
+    print(Fore.GREEN + "Available Dorking Categories:\n")
+    choice = menu_select(categories)
+    if choice == "1":
+        select_website_dork()
+    elif choice in ["2", "3", "4"]:
+        target_query = "Enter your search query: " if choice == "4" else "Enter the target domain: "
+        query = input_target(target_query)
+        if not query:
+            return
+        perform_category_dork(choice, query)
+    elif choice == "5":
+        perform_camera_dorking()
+    elif choice == "6":
+        query = input_target("Enter your specific query: ")
+        results = google_dork(query)
+        display_results(results)
+    else:
+        print(Fore.RED + "Invalid selection. Please try again.")
 
-    category_choice = input(Fore.BLUE + "Enter the category name exactly as shown: ")
-    if category_choice in categories:
-        query = categories[category_choice].format(target=target)
+def perform_category_dork(choice, query):
+    payloads = {
+        "2": f"site:{query} ext:pdf OR ext:doc OR ext:docx OR ext:ppt OR ext:pptx intitle:\"lectures\" OR \"assignments\" OR \"examinations\" OR \"syllabus\" OR \"academic\" OR \"course\"",
+        "3": f"site:{query} ext:gov",
+        "4": f"\"{query}\" site:facebook.com OR site:twitter.com OR site:instagram.com OR site:linkedin.com OR site:tumblr.com OR site:pinterest.com"
+    }
+    results = google_dork(payloads[choice])
+    display_results(results)
+
+def select_website_dork():
+    website_categories = {
+        "1": "Configuration Files",
+        "2": "Database Files",
+        "3": "Backup Files",
+        "4": "Source Code Repositories",
+        "5": "Document Files",
+        "6": "Error Messages",
+        "7": "Common Web Files",
+        "8": "Cloud Services",
+        "9": "Git Providers",
+        "10": "Login Pages"
+    }
+
+    print(Fore.GREEN + "Available Website Dork Categories:\n")
+    category_choice = menu_select(website_categories)
+    if category_choice in website_categories:
+        target = input_target("Enter the target domain: ")
+        if not target:
+            return
+        query = generate_website_query(category_choice, target)
         results = google_dork(query)
         display_results(results)
     else:
         print(Fore.RED + "Invalid category choice. Please try again.")
 
-def individual_dorking():
-    query = input(Fore.MAGENTA + "Enter your specific query: ").strip()
-    results = google_dork(query, num_results=20)
-    display_results(results)
+def generate_website_query(choice, target):
+    queries = {
+        "1": f"site:{target} ext:xml | ext:conf | ext:cnf | ext:reg | ext:inf | ext:rdp | ext:cfg | ext:txt | ext:ora | ext:env | ext:ini",
+        "2": f"site:{target} ext:sql | ext:db | ext:dbf | ext:mdb",
+        "3": f"site:{target} ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup",
+        "4": f"inurl:\"/.git\" {target} -site:github.com",
+        "5": f"site:{target} ext:doc | ext:docx | ext:odt | ext:pdf",
+        "6": f"site:{target} intext:\"error log\"",
+        "7": f"site:{target} \"Index of /admin\"",
+        "8": f"site:\"blob.core.windows.net\" {target}",
+        "9": f"site:github.com {target} | site:gitlab.com {target}",
+        "10": f"site:{target} inurl:login"
+    }
+    return queries[choice]
 
-def camera_dorking():
-    camera_dorks = [
-        "inurl:”CgiStart?page=”",
-        "inurl:/view.shtml",
-        "intitle:”Live View/ — AXIS”",
-        "intitle:”live view” intitle:axis",
-        "intitleiaxis intitle:”video server",
-        "intitle:”Live View/ — AXIS 206M”",
-        "intitle:”sony network camera snc-pl ?",
-        "site:.viewnetcam.com -www.viewnetcam.com",
-        "intitle:”i-Catcher Console — Web Monitor”",   
-    ]
+def perform_camera_dorking():
+    camera_dorks = {
+        "1": "inurl:\"CgiStart?page=\"",
+        "2": "inurl:/view.shtml",
+        "3": "intitle:\"Live View / - AXIS\"",
+        # Add more camera dorks as needed
+    }
 
     print(Fore.GREEN + "Available Camera Dorks:\n")
-    for dork in camera_dorks:
-        print(Fore.CYAN + Style.BRIGHT + dork)
+    dork_choice = menu_select(camera_dorks)
+    if dork_choice in camera_dorks:
+        results = google_dork(camera_dorks[dork_choice], num_results=20)
+        display_results(results)
+    else:
+        print(Fore.RED + "Invalid camera dork selection. Please try again.")
 
 def main():
     print_skull()
-    target = input_target()
-    if not target:
-        sys.exit(1)
-
-    print(Fore.YELLOW + "1. Website Dorking")
-    print(Fore.YELLOW + "2. Individual Dorking")
-    print(Fore.YELLOW + "3. Camera Dorking")
-    choice = int(input(Fore.BLUE + "Select an option (1, 2, or 3): "))
-
-    if choice == 1:
-        select_website_dork(target)
-    elif choice == 2:
-        individual_dorking()
-    elif choice == 3:
-        camera_dorking()
-    else:
-        print(Fore.RED + "Invalid selection. Exiting.")
-        sys.exit(1)
+    print(Fore.YELLOW + "Select a dorking category to begin:")
+    
+    
+    select_dorking_category()
 
 if __name__ == "__main__":
     main()
