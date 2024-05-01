@@ -2,6 +2,7 @@ import socket
 import colorama
 from colorama import Fore, Style
 import sys
+import requests
 from googlesearch import search
 
 colorama.init(autoreset=True)
@@ -31,20 +32,24 @@ def print_skull():
      │  \_/ \_/    \_/ \_/ \_/ \_/ \_/ \_/  │
      │                                      │
      └──────────────────────────────────────┘
-                [ Version 3.0.0 ]
+                [ Version 4.0.0 ]
          [ Special Thanks to @Vortex4242 ]
     """)
 
-def google_dork(query, num_results=10):
+def google_dork(query, num_results=10, proxy=None):
     print(Fore.CYAN + "Performing Google Dork search with payload: " + query)
     results = []
     try:
-        for result in search(query, num_results=num_results):
-            results.append(result)
+        response = requests.get(f"https://www.google.com/search?q={query}", timeout=10, proxies={'http': proxy, 'https': proxy} if proxy else None)
+        if response.status_code == 200:
+            for result in search(query, num_results=num_results):
+                results.append(result)
+        else:
+            print(Fore.RED + f"Error {response.status_code} occurred.")
     except Exception as e:
         print(Fore.RED + f"An error occurred: {e}")
     if not results:
-        print(Fore.RED + "No such results.")
+        print(Fore.RED + "No results found.")
     return results
 
 def display_results(results):
@@ -61,7 +66,7 @@ def menu_select(options):
     choice = input(Fore.BLUE + "Select an option by number: ")
     return choice
 
-def select_dorking_category():
+def select_dorking_category(proxy):
     categories = {
         "1": "Website Dorking",
         "2": "Educational Files",
@@ -74,32 +79,32 @@ def select_dorking_category():
     print(Fore.GREEN + "Available Dorking Categories:\n")
     choice = menu_select(categories)
     if choice == "1":
-        select_website_dork()
+        select_website_dork(proxy)
     elif choice in ["2", "3", "4"]:
         target_query = "Enter your search query: " if choice == "4" else "Enter the target domain: "
         query = input_target(target_query)
         if not query:
             return
-        perform_category_dork(choice, query)
+        perform_category_dork(choice, query, proxy)
     elif choice == "5":
-        perform_camera_dorking()
+        perform_camera_dorking(proxy)
     elif choice == "6":
         query = input_target("Enter your specific query: ")
-        results = google_dork(query)
+        results = google_dork(query, proxy=proxy)
         display_results(results)
     else:
         print(Fore.RED + "Invalid selection. Please try again.")
 
-def perform_category_dork(choice, query):
+def perform_category_dork(choice, query, proxy):
     payloads = {
         "2": f"site:{query} ext:pdf OR ext:doc OR ext:docx OR ext:ppt OR ext:pptx intitle:\"lectures\" OR \"assignments\" OR \"examinations\" OR \"syllabus\" OR \"academic\" OR \"course\"",
         "3": f"site:{query} ext:gov",
         "4": f"\"{query}\" site:facebook.com OR site:twitter.com OR site:instagram.com OR site:linkedin.com OR site:tumblr.com OR site:pinterest.com"
     }
-    results = google_dork(payloads[choice])
+    results = google_dork(payloads[choice], proxy=proxy)
     display_results(results)
 
-def select_website_dork():
+def select_website_dork(proxy):
     website_categories = {
         "1": "Configuration Files",
         "2": "Database Files",
@@ -120,7 +125,7 @@ def select_website_dork():
         if not target:
             return
         query = generate_website_query(category_choice, target)
-        results = google_dork(query)
+        results = google_dork(query, proxy=proxy)
         display_results(results)
     else:
         print(Fore.RED + "Invalid category choice. Please try again.")
@@ -140,7 +145,7 @@ def generate_website_query(choice, target):
     }
     return queries[choice]
 
-def perform_camera_dorking():
+def perform_camera_dorking(proxy):
     camera_dorks = {
         "1": "inurl:\"CgiStart?page=\"",
         "2": "inurl:/view.shtml",
@@ -151,17 +156,15 @@ def perform_camera_dorking():
     print(Fore.GREEN + "Available Camera Dorks:\n")
     dork_choice = menu_select(camera_dorks)
     if dork_choice in camera_dorks:
-        results = google_dork(camera_dorks[dork_choice], num_results=20)
+        results = google_dork(camera_dorks[dork_choice], num_results=20, proxy=proxy)
         display_results(results)
     else:
         print(Fore.RED + "Invalid camera dork selection. Please try again.")
 
 def main():
     print_skull()
-    print(Fore.YELLOW + "Select a dorking category to begin:")
-    
-    
-    select_dorking_category()
+    proxy = input(Fore.BLUE + "Enter proxy (if any): ")
+    select_dorking_category(proxy)
 
 if __name__ == "__main__":
     main()
